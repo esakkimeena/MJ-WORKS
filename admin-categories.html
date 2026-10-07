@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MJ Works - Categories</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff7fa;
+            color: #4a2c35;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f8b6c8, #f7d5df);
+            padding: 22px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #7b2946;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1000px;
+            margin: 25px auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            background: #7b2946;
+            color: white;
+        }
+
+        .add-btn {
+            background: #d81b60;
+            color: white;
+        }
+
+        .form-box {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-box input,
+        .form-box select {
+            width: 100%;
+            padding: 11px;
+            margin: 7px 0 12px;
+            border: 1px solid #e5b8c8;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        .save-btn {
+            background: #d81b60;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #ddd;
+            color: #333;
+            margin-left: 5px;
+        }
+
+        .category {
+            background: white;
+            padding: 18px;
+            margin: 12px 0;
+            border-radius: 12px;
+            border: 1px solid #f3b6cc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .category h3 {
+            margin-top: 0;
+            color: #c2185b;
+        }
+
+        .category p {
+            line-height: 1.7;
+        }
+
+        .category-actions {
+            margin-top: 12px;
+        }
+
+        .edit-btn {
+            background: #e9a0b8;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #d9534f;
+            color: white;
+            margin-left: 5px;
+        }
+
+        .empty {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+
+            .top-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>MJ Works Categories</h1>
+</header>
+
+<div class="container">
+
+    <div class="top-bar">
+
+        <button class="back-btn"
+                onclick="window.location.href='admin-dashboard.html'">
+            ← Back to Dashboard
+        </button>
+
+        <button class="add-btn" onclick="showAddForm()">
+            + Add Category
+        </button>
+
+    </div>
+
+
+    <!-- ADD / EDIT FORM -->
+
+    <div class="form-box" id="categoryForm">
+
+        <h2 id="formTitle">Add Category</h2>
+
+        <input
+            type="text"
+            id="mainCategory"
+            placeholder="Main Category (Kundan / Crochet)"
+        >
+
+        <input
+            type="text"
+            id="subCategory"
+            placeholder="Sub Category (Earrings / Bangles)"
+        >
+
+        <div>
+            <button class="save-btn" onclick="saveCategory()">
+                Save Category
+            </button>
+
+            <button class="cancel-btn" onclick="hideForm()">
+                Cancel
+            </button>
+        </div>
+
+    </div>
+
+
+    <div id="message" class="message"></div>
+
+    <div id="categoriesContainer">
+        <div class="empty">
+            Loading categories...
+        </div>
+    </div>
+
+</div>
+
+
+<script type="module">
+
+    import { auth, db } from "./firebase-config.js";
+
+    import {
+        collection,
+        getDocs,
+        addDoc,
+        updateDoc,
+        deleteDoc,
+        doc
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    import {
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+    const categoriesContainer =
+        document.getElementById("categoriesContainer");
+
+    const categoryForm =
+        document.getElementById("categoryForm");
+
+    const formTitle =
+        document.getElementById("formTitle");
+
+    const mainCategory =
+        document.getElementById("mainCategory");
+
+    const subCategory =
+        document.getElementById("subCategory");
+
+    const message =
+        document.getElementById("message");
+
+
+    let editingId = null;
+
+
+    // ==============================
+    // AUTH CHECK
+    // ==============================
+
+    onAuthStateChanged(auth, (user) => {
+
+        if (!user) {
+
+            window.location.href = "admin-login.html";
+            return;
+
+        }
+
+        loadCategories();
+
+    });
+
+
+    // ==============================
+    // LOAD CATEGORIES
+    // ==============================
+
+    async function loadCategories() {
+
+        categoriesContainer.innerHTML = `
+            <div class="empty">
+                Loading categories...
+            </div>
+        `;
+
+        try {
+
+            const snapshot = await getDocs(
+                collection(db, "categories")
+            );
+
+
+            if (snapshot.empty) {
+
+                categoriesContainer.innerHTML = `
+                    <div class="empty">
+                        <h3>No Categories Yet</h3>
+                        <p>Click "+ Add Category" to create one.</p>
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            categoriesContainer.innerHTML = "";
+
+
+            snapshot.forEach((categoryDoc) => {
+
+                const data = categoryDoc.data();
+
+                const id = categoryDoc.id;
+
+                const main =
+                    data.mainCategory || "";
+
+                const sub =
+                    data.subCategory || "";
+
+
+                const div =
+                    document.createElement("div");
+
+                div.className = "category";
+
+
+                div.innerHTML = `
+
+                    <h3>${main}</h3>
+
+                    <p>
+                        <strong>Sub Category:</strong>
+                        ${sub}
+                    </p>
+
+                    <div class="category-actions">
+
+                        <button
+                            class="edit-btn"
+                            data-id="${id}">
+                            ✏️ Edit
+                        </button>
+
+                        <button
+                            class="delete-btn"
+                            data-id="${id}">
+                            🗑 Delete
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                categoriesContainer.appendChild(div);
+
+
+                // EDIT
+
+                div.querySelector(".edit-btn")
+                    .addEventListener("click", () => {
+
+                        editingId = id;
+
+                        mainCategory.value = main;
+
+                        subCategory.value = sub;
+
+                        formTitle.textContent =
+                            "Edit Category";
+
+                        categoryForm.style.display =
+                            "block";
+
+                        window.scrollTo({
+                            top: 0,
+                            behavior: "smooth"
+                        });
+
+                    });
+
+
+                // DELETE
+
+                div.querySelector(".delete-btn")
+                    .addEventListener("click", async () => {
+
+                        const confirmDelete =
+                            confirm(
+                                `Delete "${main} - ${sub}"?`
+                            );
+
+                        if (!confirmDelete) {
+                            return;
+                        }
+
+
+                        try {
+
+                            await deleteDoc(
+                                doc(
+                                    db,
+                                    "categories",
+                                    id
+                                )
+                            );
+
+                            showMessage(
+                                "Category deleted successfully!"
+                            );
+
+                            loadCategories();
+
+                        } catch (error) {
+
+                            console.error(error);
+
+                            showMessage(
+                                "Failed to delete category."
+                            );
+
+                        }
+
+                    });
+
+            });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            categoriesContainer.innerHTML = `
+                <div class="empty">
+                    <h3>Error ❌</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+
+        }
+
+    }
+
+
+    // ==============================
+    // SHOW ADD FORM
+    // ==============================
+
+    window.showAddForm = function () {
+
+        editingId = null;
+
+        formTitle.textContent =
+            "Add Category";
+
+        mainCategory.value = "";
+
+        subCategory.value = "";
+
+        categoryForm.style.display =
+            "block";
+
+    };
+
+
+    // ==============================
+    // HIDE FORM
+    // ==============================
+
+    window.hideForm = function () {
+
+        categoryForm.style.display =
+            "none";
+
+        editingId = null;
+
+        mainCategory.value = "";
+
+        subCategory.value = "";
+
+    };
+
+
+    // ==============================
+    // SAVE CATEGORY
+    // ==============================
+
+    window.saveCategory = async function () {
+
+        const main =
+            mainCategory.value.trim();
+
+        const sub =
+            subCategory.value.trim();
+
+
+        if (!main || !sub) {
+
+            showMessage(
+                "Please enter both category fields."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            if (editingId) {
+
+                await updateDoc(
+                    doc(
+                        db,
+                        "categories",
+                        editingId
+                    ),
+                    {
+                        mainCategory: main,
+                        subCategory: sub
+                    }
+                );
+
+                showMessage(
+                    "Category updated successfully!"
+                );
+
+            } else {
+
+                await addDoc(
+                    collection(db, "categories"),
+                    {
+                        mainCategory: main,
+                        subCategory: sub,
+                        createdAt:
+                            new Date().toISOString()
+                    }
+                );
+
+                showMessage(
+                    "Category added successfully!"
+                );
+
+            }
+
+
+            hideForm();
+
+            loadCategories();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Failed to save category."
+            );
+
+        }
+
+    };
+
+
+    // ==============================
+    // MESSAGE
+    // ==============================
+
+    function showMessage(text) {
+
+        message.textContent = text;
+
+        setTimeout(() => {
+
+            message.textContent = "";
+
+        }, 3000);
+
+    }
+
+</script>
+
+</body>
+</html>

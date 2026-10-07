@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MJ Works - Admin Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff5f8;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f8bbd0, #f48fb1);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #880e4f;
+        }
+
+        #logoutBtn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #ad1457;
+            color: white;
+            cursor: pointer;
+        }
+
+        .container {
+            padding: 30px;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            color: #ad1457;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #c2185b;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #777;
+        }
+
+        .card button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #d81b60;
+            color: white;
+            cursor: pointer;
+        }
+
+        .card button:hover {
+            background: #ad1457;
+        }
+
+        @media (max-width: 800px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>MJ Works Admin</h1>
+    <button id="logoutBtn">Logout</button>
+</header>
+
+<div class="container">
+
+    <div class="welcome">
+        <h2>Welcome, Admin 👋</h2>
+        <p>Manage your MJ Works website from here.</p>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="card">
+            <h3>🛍️ Products</h3>
+            <p>Add, edit and delete products.</p>
+            <button onclick="window.location.href='admin-products.html'">
+                Manage Products
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>📂 Categories</h3>
+            <p>Manage product categories.</p>
+            <button onclick="window.location.href='admin-categories.html'">
+                Categories
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>📦 Orders</h3>
+            <p>View customer orders.</p>
+            <button onclick="window.location.href='admin-orders.html'">
+                Orders
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>⚙️ Settings</h3>
+            <p>Manage admin settings.</p>
+            <button onclick="window.location.href='admin-settings.html'">
+                Settings
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+    import { auth } from "./firebase-config.js";
+
+    import {
+        onAuthStateChanged,
+        signOut
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+    // Check whether user is logged in
+    onAuthStateChanged(auth, (user) => {
+
+        if (!user) {
+            window.location.href = "admin-login.html";
+        }
+
+    });
+
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+
+        try {
+
+            await signOut(auth);
+
+            window.location.href = "admin-login.html";
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

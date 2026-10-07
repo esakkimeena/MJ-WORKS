@@ -2,6 +2,32 @@
    MJ WORKS - COMPLETE SCRIPT.JS
 ========================================================= */
 
+async function getWhatsAppNumber() {
+    try {
+        const { db } = await import("./firebase-config.js");
+
+        const { doc, getDoc } = await import(
+            "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js"
+        );
+
+        const settingsRef = doc(db, "settings", "shop");
+        const settingsSnap = await getDoc(settingsRef);
+
+        if (settingsSnap.exists()) {
+            const data = settingsSnap.data();
+
+            if (data.whatsappNumber) {
+                return data.whatsappNumber.replace(/\D/g, "");
+            }
+        }
+    } catch (error) {
+        console.error("Failed to load WhatsApp number:", error);
+    }
+
+    return "916380554187";
+}
+
+
 document.addEventListener("DOMContentLoaded", function () {
 
     console.log("MJ WORKS JS LOADED");
@@ -11,143 +37,244 @@ document.addEventListener("DOMContentLoaded", function () {
        CATEGORY SYSTEM
     ===================================================== */
 
-    const categoryTabs = document.querySelectorAll(".category-tab");
-    const categorySections = document.querySelectorAll(".category-section");
+    const categoryTabs =
+        document.querySelectorAll(".category-tab");
+
+    const categorySections =
+        document.querySelectorAll(".category-section");
+
 
     categoryTabs.forEach(function (tab) {
 
         tab.addEventListener("click", function () {
 
-            const target = tab.getAttribute("data-target");
+            const target =
+                tab.getAttribute("data-target");
 
-            const parentSection = tab.closest(".category-section");
+            const parentSection =
+                tab.closest(".category-section");
 
             if (!parentSection) return;
 
+
             /* Remove active from tabs */
-            parentSection.querySelectorAll(".category-tab")
+
+            parentSection
+                .querySelectorAll(".category-tab")
                 .forEach(function (item) {
+
                     item.classList.remove("active");
+
                 });
+
 
             /* Hide panels */
-            parentSection.querySelectorAll(".collection-panel")
+
+            parentSection
+                .querySelectorAll(".collection-panel")
                 .forEach(function (panel) {
+
                     panel.classList.remove("active");
+
                 });
 
+
             /* Activate selected tab */
+
             tab.classList.add("active");
 
+
             /* Show selected panel */
-            const panel = parentSection.querySelector(
-                `[data-panel="${target}"]`
-            );
+
+            const panel =
+                parentSection.querySelector(
+                    `[data-panel="${target}"]`
+                );
+
 
             if (panel) {
+
                 panel.classList.add("active");
 
+
                 setTimeout(function () {
+
                     panel.scrollIntoView({
                         behavior: "smooth",
                         block: "start"
                     });
+
                 }, 100);
+
             }
+
         });
 
     });
+
 
 
     /* =====================================================
        BACK BUTTON
     ===================================================== */
 
-    document.querySelectorAll(".back-btn").forEach(function (button) {
+    document
+        .querySelectorAll(".back-btn")
+        .forEach(function (button) {
 
-        button.addEventListener("click", function () {
+            button.addEventListener("click", function () {
 
-            const section = button.closest(".category-section");
+                const section =
+                    button.closest(".category-section");
 
-            if (!section) return;
+                if (!section) return;
 
-            section.querySelectorAll(".collection-panel")
-                .forEach(function (panel) {
-                    panel.classList.remove("active");
-                });
 
-            section.querySelectorAll(".category-tab")
-                .forEach(function (tab) {
-                    tab.classList.remove("active");
-                });
+                section
+                    .querySelectorAll(".collection-panel")
+                    .forEach(function (panel) {
 
-            const tabs = section.querySelector(".category-tabs");
+                        panel.classList.remove("active");
 
-            if (tabs) {
-                tabs.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-            }
+                    });
+
+
+                section
+                    .querySelectorAll(".category-tab")
+                    .forEach(function (tab) {
+
+                        tab.classList.remove("active");
+
+                    });
+
+
+                const tabs =
+                    section.querySelector(".category-tabs");
+
+
+                if (tabs) {
+
+                    tabs.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                }
+
+            });
 
         });
 
-    });
 
 
     /* =====================================================
        HEART BUTTON
     ===================================================== */
 
-    document.querySelectorAll(".heart-btn").forEach(function (button) {
+    document
+        .querySelectorAll(".heart-btn")
+        .forEach(function (button) {
 
-        button.addEventListener("click", function (event) {
+            button.addEventListener(
+                "click",
+                function (event) {
 
-            event.preventDefault();
-            event.stopPropagation();
+                    event.preventDefault();
+                    event.stopPropagation();
 
-            button.classList.toggle("liked");
 
-            if (button.classList.contains("liked")) {
-                button.innerHTML = "♥";
-            } else {
-                button.innerHTML = "♡";
-            }
+                    button.classList.toggle("liked");
+
+
+                    if (
+                        button.classList.contains("liked")
+                    ) {
+
+                        button.innerHTML = "♥";
+
+                    } else {
+
+                        button.innerHTML = "♡";
+
+                    }
+
+                }
+            );
 
         });
 
-    });
 
 
     /* =====================================================
        PRODUCT MODAL
     ===================================================== */
 
-    const modal = document.getElementById("productModal");
-    const closeModalBtn = document.getElementById("closeProductModal");
+    const modal =
+        document.getElementById("productModal");
 
-    const modalImage = document.getElementById("modalProductImage");
-    const modalName = document.getElementById("modalProductName");
-    const modalPrice = document.getElementById("modalProductPrice");
+    const closeModalBtn =
+        document.getElementById(
+            "closeProductModal"
+        );
 
-    const sizeBox = document.getElementById("bangleSizeBox");
-    const sizeSelect = document.getElementById("bangleSize");
+    const modalImage =
+        document.getElementById(
+            "modalProductImage"
+        );
 
-    const qtyText = document.getElementById("productQty");
-    const minusBtn = document.getElementById("minusQty");
-    const plusBtn = document.getElementById("plusQty");
+    const modalName =
+        document.getElementById(
+            "modalProductName"
+        );
 
-    const modalOrderBtn = document.getElementById("modalOrderBtn");
+    const modalPrice =
+        document.getElementById(
+            "modalProductPrice"
+        );
+
+    const sizeBox =
+        document.getElementById(
+            "bangleSizeBox"
+        );
+
+    const sizeSelect =
+        document.getElementById(
+            "bangleSize"
+        );
+
+    const qtyText =
+        document.getElementById(
+            "productQty"
+        );
+
+    const minusBtn =
+        document.getElementById(
+            "minusQty"
+        );
+
+    const plusBtn =
+        document.getElementById(
+            "plusQty"
+        );
+
+    const modalOrderBtn =
+        document.getElementById(
+            "modalOrderBtn"
+        );
 
 
     let selectedProduct = {
+
         name: "",
         price: "",
         image: "",
         isBangle: false
+
     };
 
+
     let quantity = 1;
+
 
 
     /* =====================================================
@@ -158,42 +285,66 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!card) return null;
 
+
         const nameElement =
-            card.querySelector(".product-info h4");
+            card.querySelector(
+                ".product-info h4"
+            );
+
 
         const priceElement =
-            card.querySelector(".product-price");
+            card.querySelector(
+                ".product-price"
+            );
+
 
         const imageElement =
             card.querySelector(
                 ".product-image > img:not(.product-watermark)"
             );
 
+
         if (!nameElement || !imageElement) {
+
             return null;
+
         }
+
 
         const name =
             nameElement.textContent.trim();
+
 
         const price =
             priceElement
                 ? priceElement.textContent.trim()
                 : "DM for price details";
 
+
         /*
            Detect only Kundan Bangles
         */
+
         const banglePanel =
-            card.closest('[data-panel="kundan-bangles"]');
+            card.closest(
+                '[data-panel="kundan-bangles"]'
+            );
+
 
         return {
+
             name: name,
+
             price: price,
+
             image: imageElement.src,
+
             isBangle: !!banglePanel
+
         };
+
     }
+
 
 
     /* =====================================================
@@ -203,118 +354,221 @@ document.addEventListener("DOMContentLoaded", function () {
     function openProductModal(card) {
 
         if (!modal) {
-            console.error("productModal not found");
+
+            console.error(
+                "productModal not found"
+            );
+
             return;
+
         }
 
-        const product = getProductInfo(card);
+
+        const product =
+            getProductInfo(card);
+
 
         if (!product) {
-            console.error("Product information not found");
+
+            console.error(
+                "Product information not found"
+            );
+
             return;
+
         }
+
 
         selectedProduct = product;
 
+
+
         /* Product image */
+
         if (modalImage) {
-            modalImage.src = product.image;
-            modalImage.alt = product.name;
+
+            modalImage.src =
+                product.image;
+
+            modalImage.alt =
+                product.name;
+
         }
+
+
 
         /* Product name */
+
         if (modalName) {
-            modalName.textContent = product.name;
+
+            modalName.textContent =
+                product.name;
+
         }
+
+
 
         /* Product price */
+
         if (modalPrice) {
-            modalPrice.textContent = product.price;
+
+            modalPrice.textContent =
+                product.price;
+
         }
+
+
 
         /* Reset quantity */
+
         quantity = 1;
 
+
         if (qtyText) {
+
             qtyText.textContent = "1";
+
         }
 
+
+
         /* Reset size */
+
         if (sizeSelect) {
+
             sizeSelect.value = "";
+
         }
+
+
 
         /*
            Bangle = show size
            Everything else = hide size
         */
+
         if (sizeBox) {
 
             if (product.isBangle) {
+
                 sizeBox.classList.add("show");
+
             } else {
+
                 sizeBox.classList.remove("show");
+
             }
 
         }
 
+
+
         /* SHOW POPUP */
+
         modal.classList.add("active");
 
-        document.body.style.overflow = "hidden";
+        document.body.style.overflow =
+            "hidden";
 
-        console.log("Opened:", product.name);
+
+        console.log(
+            "Opened:",
+            product.name
+        );
+
     }
+
+
+    /*
+       Firebase products use this
+    */
+
+    window.openProductModal =
+        openProductModal;
+
 
 
     /* =====================================================
        PRODUCT CARD CLICK
     ===================================================== */
 
-    document.querySelectorAll(".product-card").forEach(function (card) {
+    document
+        .querySelectorAll(".product-card")
+        .forEach(function (card) {
 
-        card.addEventListener("click", function (event) {
+            card.addEventListener(
+                "click",
+                function (event) {
 
-            /*
-               Heart click -> don't open
-            */
-            if (event.target.closest(".heart-btn")) {
-                return;
-            }
 
-            /*
-               Order button handled separately
-            */
-            if (event.target.closest(".order-btn")) {
-                return;
-            }
+                    /*
+                       Heart click -> don't open
+                    */
 
-            openProductModal(card);
+                    if (
+                        event.target.closest(
+                            ".heart-btn"
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    /*
+                       Order button handled separately
+                    */
+
+                    if (
+                        event.target.closest(
+                            ".order-btn"
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    openProductModal(card);
+
+                }
+            );
 
         });
 
-    });
 
 
     /* =====================================================
        ORDER BUTTON -> OPEN MODAL
     ===================================================== */
 
-    document.querySelectorAll(".order-btn").forEach(function (button) {
+    document
+        .querySelectorAll(".order-btn")
+        .forEach(function (button) {
 
-        button.addEventListener("click", function (event) {
+            button.addEventListener(
+                "click",
+                function (event) {
 
-            event.preventDefault();
-            event.stopPropagation();
+                    event.preventDefault();
+                    event.stopPropagation();
 
-            const card =
-                button.closest(".product-card");
 
-            openProductModal(card);
+                    const card =
+                        button.closest(
+                            ".product-card"
+                        );
+
+
+                    openProductModal(card);
+
+                }
+            );
 
         });
 
-    });
 
 
     /* =====================================================
@@ -325,11 +579,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!modal) return;
 
+
         modal.classList.remove("active");
 
-        document.body.style.overflow = "";
+
+        document.body.style.overflow =
+            "";
 
     }
+
 
 
     if (closeModalBtn) {
@@ -342,28 +600,43 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
     /* Click outside popup */
+
     if (modal) {
 
-        modal.addEventListener("click", function (event) {
+        modal.addEventListener(
+            "click",
+            function (event) {
 
-            if (event.target === modal) {
-                closeProductModal();
+                if (event.target === modal) {
+
+                    closeProductModal();
+
+                }
+
             }
-
-        });
+        );
 
     }
 
 
+
     /* ESC key */
-    document.addEventListener("keydown", function (event) {
 
-        if (event.key === "Escape") {
-            closeProductModal();
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Escape") {
+
+                closeProductModal();
+
+            }
+
         }
+    );
 
-    });
 
 
     /* =====================================================
@@ -372,19 +645,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (plusBtn) {
 
-        plusBtn.addEventListener("click", function (event) {
+        plusBtn.addEventListener(
+            "click",
+            function (event) {
 
-            event.stopPropagation();
+                event.stopPropagation();
 
-            quantity++;
 
-            if (qtyText) {
-                qtyText.textContent = quantity;
+                quantity++;
+
+
+                if (qtyText) {
+
+                    qtyText.textContent =
+                        quantity;
+
+                }
+
             }
-
-        });
+        );
 
     }
+
 
 
     /* =====================================================
@@ -393,110 +675,291 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (minusBtn) {
 
-        minusBtn.addEventListener("click", function (event) {
+        minusBtn.addEventListener(
+            "click",
+            function (event) {
 
-            event.stopPropagation();
+                event.stopPropagation();
 
-            if (quantity > 1) {
-                quantity--;
+
+                if (quantity > 1) {
+
+                    quantity--;
+
+                }
+
+
+                if (qtyText) {
+
+                    qtyText.textContent =
+                        quantity;
+
+                }
+
             }
-
-            if (qtyText) {
-                qtyText.textContent = quantity;
-            }
-
-        });
+        );
 
     }
+
 
 
     /* =====================================================
        WHATSAPP ORDER
+       + FIRESTORE ORDER SAVE
     ===================================================== */
 
     if (modalOrderBtn) {
 
-        modalOrderBtn.addEventListener("click", function () {
+        modalOrderBtn.addEventListener(
+            "click",
+            async function () {
 
-            const phone =
-                "916380554187";
 
-            let message =
-                "Hello MJ WORKS! 👋\n\n" +
-                "I would like to order:\n\n" +
-                "Product: " +
-                selectedProduct.name +
-                "\n" +
-                "Price: " +
-                selectedProduct.price +
-                "\n" +
-                "Quantity: " +
-                quantity;
+                const phone =
+                await getWhatsAppNumber();
 
-            /*
-               BANGLE SIZE ONLY
-            */
-            if (selectedProduct.isBangle) {
 
-                if (!sizeSelect || !sizeSelect.value) {
+                /* =================================================
+                   BANGLE SIZE CHECK
+                ================================================= */
 
-                    alert(
-                        "Please select your bangle size."
-                    );
+                let bangleSize = "";
 
-                    return;
+
+                if (selectedProduct.isBangle) {
+
+                    if (
+                        !sizeSelect ||
+                        !sizeSelect.value
+                    ) {
+
+                        alert(
+                            "Please select your bangle size."
+                        );
+
+                        return;
+
+                    }
+
+
+                    bangleSize =
+                        sizeSelect.value;
+
                 }
 
+
+
+                /* =================================================
+                   ORDER DATA
+                ================================================= */
+
+                const orderData = {
+
+                    productName:
+                        selectedProduct.name,
+
+                    price:
+                        selectedProduct.price,
+
+                    quantity:
+                        quantity,
+
+                    bangleSize:
+                        bangleSize,
+
+                    image:
+                        selectedProduct.image,
+
+                    status:
+                        "New",
+
+                    createdAt:
+                        new Date().toISOString()
+
+                };
+
+
+
+                /* =================================================
+                   SAVE ORDER TO FIRESTORE
+                ================================================= */
+
+                try {
+
+                    const { db } =
+                        await import(
+                            "./firebase-config.js"
+                        );
+
+
+                    const {
+                        collection,
+                        addDoc
+                    } =
+                        await import(
+                            "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js"
+                        );
+
+
+                    await addDoc(
+                        collection(
+                            db,
+                            "orders"
+                        ),
+                        orderData
+                    );
+
+
+                    console.log(
+                        "Order saved successfully:",
+                        orderData
+                    );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Order save failed:",
+                        error
+                    );
+
+                }
+
+
+
+                /* =================================================
+                   WHATSAPP MESSAGE
+                ================================================= */
+
+                let message =
+
+                    "Hello MJ WORKS! 👋\n\n" +
+
+                    "I would like to order:\n\n" +
+
+                    "Product: " +
+
+                    selectedProduct.name +
+
+                    "\n" +
+
+                    "Price: " +
+
+                    selectedProduct.price +
+
+                    "\n" +
+
+                    "Quantity: " +
+
+                    quantity;
+
+
+
+                /* =================================================
+                   BANGLE SIZE
+                ================================================= */
+
+                if (selectedProduct.isBangle) {
+
+                    message +=
+
+                        "\nBangle Size: " +
+
+                        bangleSize;
+
+                }
+
+
+
                 message +=
-                    "\nBangle Size: " +
-                    sizeSelect.value;
+
+                    "\n\nThank you! ❤️";
+
+
+
+                /* =================================================
+                   OPEN WHATSAPP
+                ================================================= */
+
+                const url =
+
+                    "https://wa.me/" +
+
+                    phone +
+
+                    "?text=" +
+
+                    encodeURIComponent(
+                        message
+                    );
+
+
+                window.open(
+                    url,
+                    "_blank"
+                );
+
             }
-
-            message +=
-                "\n\nThank you! ❤️";
-
-
-            const url =
-                "https://wa.me/" +
-                phone +
-                "?text=" +
-                encodeURIComponent(message);
-
-
-            window.open(url, "_blank");
-
-        });
+        );
 
     }
 
 
+
     /* =====================================================
        OLD INLINE ORDER FUNCTION
-       ===================================================== */
+    ===================================================== */
 
-    window.orderProduct = function (productName, price) {
+    window.orderProduct =
+        async function (
+            productName,
+            price
+        ) {
 
-        const phone =
-            "916380554187";
+            const phone =
+            await getWhatsAppNumber();
 
-        const message =
-            "Hello MJ WORKS! 👋\n\n" +
-            "I would like to order:\n\n" +
-            "Product: " +
-            productName +
-            "\n" +
-            "Price: " +
-            price +
-            "\n\nThank you! ❤️";
 
-        const url =
-            "https://wa.me/" +
-            phone +
-            "?text=" +
-            encodeURIComponent(message);
+            const message =
 
-        window.open(url, "_blank");
-    };
+                "Hello MJ WORKS! 👋\n\n" +
+
+                "I would like to order:\n\n" +
+
+                "Product: " +
+
+                productName +
+
+                "\n" +
+
+                "Price: " +
+
+                price +
+
+                "\n\nThank you! ❤️";
+
+
+            const url =
+
+                "https://wa.me/" +
+
+                phone +
+
+                "?text=" +
+
+                encodeURIComponent(
+                    message
+                );
+
+
+            window.open(
+                url,
+                "_blank"
+            );
+
+        };
+
 
 
     /* =====================================================
@@ -504,65 +967,103 @@ document.addEventListener("DOMContentLoaded", function () {
     ===================================================== */
 
     const reviewBook =
-        document.getElementById("reviewBook");
+        document.getElementById(
+            "reviewBook"
+        );
 
     const reviewPrev =
-        document.getElementById("reviewPrev");
+        document.getElementById(
+            "reviewPrev"
+        );
 
     const reviewNext =
-        document.getElementById("reviewNext");
+        document.getElementById(
+            "reviewNext"
+        );
 
 
-    if (reviewBook && reviewPrev && reviewNext) {
+
+    if (
+        reviewBook &&
+        reviewPrev &&
+        reviewNext
+    ) {
 
         let reviewIndex = 0;
 
+
         const pages =
-            reviewBook.querySelectorAll(".review-page");
+            reviewBook.querySelectorAll(
+                ".review-page"
+            );
 
 
         function updateReview() {
 
             if (!pages.length) return;
 
+
             const width =
                 pages[0].offsetWidth;
 
+
             reviewBook.scrollTo({
-                left: reviewIndex * width,
-                behavior: "smooth"
+
+                left:
+                    reviewIndex * width,
+
+                behavior:
+                    "smooth"
+
             });
 
         }
 
 
-        reviewNext.addEventListener("click", function () {
 
-            if (reviewIndex < pages.length - 1) {
+        reviewNext.addEventListener(
+            "click",
+            function () {
 
-                reviewIndex++;
+                if (
+                    reviewIndex <
+                    pages.length - 1
+                ) {
 
-                updateReview();
+                    reviewIndex++;
+
+                    updateReview();
+
+                }
+
             }
+        );
 
-        });
 
 
-        reviewPrev.addEventListener("click", function () {
+        reviewPrev.addEventListener(
+            "click",
+            function () {
 
-            if (reviewIndex > 0) {
+                if (
+                    reviewIndex > 0
+                ) {
 
-                reviewIndex--;
+                    reviewIndex--;
 
-                updateReview();
+                    updateReview();
+
+                }
+
             }
+        );
 
-        });
 
 
         /* Touch swipe */
 
         let startX = 0;
+
 
         reviewBook.addEventListener(
             "touchstart",
@@ -572,7 +1073,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     event.touches[0].clientX;
 
             },
-            { passive: true }
+            {
+                passive: true
+            }
         );
 
 
@@ -583,34 +1086,56 @@ document.addEventListener("DOMContentLoaded", function () {
                 const endX =
                     event.changedTouches[0].clientX;
 
+
                 const difference =
                     startX - endX;
 
-                if (Math.abs(difference) < 50) {
+
+                if (
+                    Math.abs(difference) < 50
+                ) {
+
                     return;
+
                 }
+
 
                 if (difference > 0) {
 
-                    if (reviewIndex < pages.length - 1) {
+                    if (
+                        reviewIndex <
+                        pages.length - 1
+                    ) {
+
                         reviewIndex++;
-                    }
 
-                } else {
-
-                    if (reviewIndex > 0) {
-                        reviewIndex--;
                     }
 
                 }
+
+                else {
+
+                    if (
+                        reviewIndex > 0
+                    ) {
+
+                        reviewIndex--;
+
+                    }
+
+                }
+
 
                 updateReview();
 
             },
-            { passive: true }
+            {
+                passive: true
+            }
         );
 
     }
+
 
 
     /* =====================================================
@@ -618,99 +1143,150 @@ document.addEventListener("DOMContentLoaded", function () {
     ===================================================== */
 
     const reviewForm =
-        document.getElementById("reviewForm");
+        document.getElementById(
+            "reviewForm"
+        );
 
     const reviewName =
-        document.getElementById("reviewName");
+        document.getElementById(
+            "reviewName"
+        );
 
     const reviewText =
-        document.getElementById("reviewText");
+        document.getElementById(
+            "reviewText"
+        );
 
     const reviewImage =
-        document.getElementById("reviewImage");
+        document.getElementById(
+            "reviewImage"
+        );
+
 
 
     if (reviewForm) {
 
-        reviewForm.addEventListener("submit", function (event) {
+        reviewForm.addEventListener(
+            "submit",
+            function (event) {
 
-            event.preventDefault();
-
-            const name =
-                reviewName.value.trim();
-
-            const text =
-                reviewText.value.trim();
-
-            const file =
-                reviewImage.files[0];
+                event.preventDefault();
 
 
-            if (!name || !text || !file) {
-
-                alert(
-                    "Please fill all fields and upload an image."
-                );
-
-                return;
-            }
+                const name =
+                    reviewName.value.trim();
 
 
-            const reader =
-                new FileReader();
+                const text =
+                    reviewText.value.trim();
 
 
-            reader.onload = function (e) {
-
-                const review = {
-                    name: name,
-                    text: text,
-                    image: e.target.result,
-                    date: new Date().toLocaleDateString()
-                };
+                const file =
+                    reviewImage.files[0];
 
 
-                let reviews = [];
+                if (
+                    !name ||
+                    !text ||
+                    !file
+                ) {
 
-                try {
+                    alert(
+                        "Please fill all fields and upload an image."
+                    );
 
-                    reviews =
-                        JSON.parse(
-                            localStorage.getItem(
-                                "mjWorksReviews"
-                            )
-                        ) || [];
-
-                } catch (error) {
-
-                    reviews = [];
+                    return;
 
                 }
 
 
-                reviews.unshift(review);
+
+                const reader =
+                    new FileReader();
 
 
-                localStorage.setItem(
-                    "mjWorksReviews",
-                    JSON.stringify(reviews)
+
+                reader.onload =
+                    function (e) {
+
+
+                        const review = {
+
+                            name:
+                                name,
+
+                            text:
+                                text,
+
+                            image:
+                                e.target.result,
+
+                            date:
+                                new Date()
+                                    .toLocaleDateString()
+
+                        };
+
+
+
+                        let reviews = [];
+
+
+                        try {
+
+                            reviews =
+                                JSON.parse(
+                                    localStorage.getItem(
+                                        "mjWorksReviews"
+                                    )
+                                ) || [];
+
+                        }
+
+                        catch (error) {
+
+                            reviews = [];
+
+                        }
+
+
+
+                        reviews.unshift(
+                            review
+                        );
+
+
+
+                        localStorage.setItem(
+                            "mjWorksReviews",
+                            JSON.stringify(
+                                reviews
+                            )
+                        );
+
+
+
+                        reviewForm.reset();
+
+
+
+                        alert(
+                            "Review added successfully ❤️"
+                        );
+
+                    };
+
+
+
+                reader.readAsDataURL(
+                    file
                 );
 
-
-                reviewForm.reset();
-
-                alert(
-                    "Review added successfully ❤️"
-                );
-
-            };
-
-
-            reader.readAsDataURL(file);
-
-        });
+            }
+        );
 
     }
+
 
 
     /* =====================================================
@@ -718,33 +1294,54 @@ document.addEventListener("DOMContentLoaded", function () {
     ===================================================== */
 
     const menuBtn =
-        document.getElementById("menuBtn");
+        document.getElementById(
+            "menuBtn"
+        );
 
     const navbar =
-        document.querySelector(".navbar");
+        document.querySelector(
+            ".navbar"
+        );
 
 
-    if (menuBtn && navbar) {
 
-        menuBtn.addEventListener("click", function () {
+    if (
+        menuBtn &&
+        navbar
+    ) {
 
-            navbar.classList.toggle("show");
+        menuBtn.addEventListener(
+            "click",
+            function () {
 
-        });
+                navbar.classList.toggle(
+                    "show"
+                );
+
+            }
+        );
 
 
-        navbar.querySelectorAll("a")
+
+        navbar
+            .querySelectorAll("a")
             .forEach(function (link) {
 
-                link.addEventListener("click", function () {
+                link.addEventListener(
+                    "click",
+                    function () {
 
-                    navbar.classList.remove("show");
+                        navbar.classList.remove(
+                            "show"
+                        );
 
-                });
+                    }
+                );
 
             });
 
     }
+
 
 
     /* =====================================================
@@ -756,13 +1353,30 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 });
-function customOrder() {
-    const message = encodeURIComponent(
-        "Hello MJ WORKS! I would like to place a custom order."
-    );
+
+
+
+/* =========================================================
+   CUSTOM ORDER
+========================================================= */
+
+async function customOrder() {
+
+    const message =
+        encodeURIComponent(
+            "Hello MJ WORKS! I would like to place a custom order."
+        );
+
 
     window.open(
-        "https://wa.me/916380554187?text=" + message,
+
+        "https://wa.me/" +
+        await getWhatsAppNumber() +
+        "?text=" +
+        message,
+
         "_blank"
+
     );
+
 }

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MJ Works - Orders</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff5f8;
+            color: #4a2c35;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f8b6c8, #f7d5df);
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #7b2946;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1100px;
+            margin: 25px auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            background: #7b2946;
+            color: white;
+        }
+
+        .refresh-btn {
+            background: #e9a0b8;
+            color: white;
+        }
+
+        .order-box {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #e9a0b8;
+        }
+
+        .order-content {
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        .order-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #f0c4d2;
+        }
+
+        .order-details {
+            flex: 1;
+        }
+
+        .order-details h3 {
+            margin-top: 0;
+            color: #7b2946;
+        }
+
+        .order-details p {
+            margin: 8px 0;
+        }
+
+        .status-select {
+            padding: 7px 12px;
+            border-radius: 8px;
+            border: 1px solid #e9a0b8;
+            background: #fff5f8;
+            color: #7b2946;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .status-label {
+            font-weight: bold;
+            color: #7b2946;
+        }
+
+        .actions {
+            margin-top: 15px;
+        }
+
+        .delete-btn {
+            background: #d9534f;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+        }
+
+        .saving {
+            color: #c2185b;
+            font-size: 13px;
+            margin-left: 8px;
+        }
+
+        @media (max-width: 600px) {
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .order-content {
+                flex-direction: column;
+            }
+
+            .order-image {
+                width: 100%;
+                height: 180px;
+            }
+
+            .status-select {
+                width: 100%;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<header>
+    <h1>MJ Works Orders</h1>
+</header>
+
+
+<div class="container">
+
+    <div class="top-bar">
+
+        <button
+            class="back-btn"
+            onclick="window.location.href='admin-dashboard.html'">
+            ← Back to Dashboard
+        </button>
+
+        <button
+            class="refresh-btn"
+            onclick="loadOrders()">
+            🔄 Refresh Orders
+        </button>
+
+    </div>
+
+
+    <div id="ordersContainer">
+
+        <div class="empty">
+            Loading orders...
+        </div>
+
+    </div>
+
+</div>
+
+
+<script type="module">
+
+    // ==========================================
+    // FIREBASE IMPORTS
+    // ==========================================
+
+    import { auth, db } from "./firebase-config.js";
+
+    import {
+        collection,
+        getDocs,
+        doc,
+        deleteDoc,
+        updateDoc
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    import {
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+    // ==========================================
+    // ELEMENTS
+    // ==========================================
+
+    const ordersContainer =
+        document.getElementById("ordersContainer");
+
+
+    // ==========================================
+    // AUTH CHECK
+    // ==========================================
+
+    onAuthStateChanged(auth, (user) => {
+
+        if (!user) {
+
+            window.location.href = "admin-login.html";
+
+            return;
+        }
+
+        loadOrders();
+
+    });
+
+
+    // ==========================================
+    // LOAD ORDERS
+    // ==========================================
+
+    async function loadOrders() {
+
+        ordersContainer.innerHTML = `
+            <div class="empty">
+                Loading orders...
+            </div>
+        `;
+
+
+        try {
+
+            const snapshot =
+                await getDocs(
+                    collection(db, "orders")
+                );
+
+
+            // ==================================
+            // NO ORDERS
+            // ==================================
+
+            if (snapshot.empty) {
+
+                ordersContainer.innerHTML = `
+                    <div class="empty">
+
+                        <h3>No Orders Yet 📦</h3>
+
+                        <p>
+                            Customer orders will appear here.
+                        </p>
+
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            ordersContainer.innerHTML = "";
+
+
+            // ==================================
+            // DISPLAY EACH ORDER
+            // ==================================
+
+            snapshot.forEach((orderDoc) => {
+
+                const order =
+                    orderDoc.data();
+
+                const orderId =
+                    orderDoc.id;
+
+
+                const image =
+                    order.image || "";
+
+
+                const productName =
+                    order.productName ||
+                    "Unknown Product";
+
+
+                const price =
+                    order.price ||
+                    "Custom Price";
+
+
+                const quantity =
+                    order.quantity ||
+                    1;
+
+
+                const bangleSize =
+                    order.bangleSize ||
+                    "Not applicable";
+
+
+                const status =
+                    order.status ||
+                    "New";
+
+
+                const createdAt =
+                    order.createdAt
+                    ? new Date(
+                        order.createdAt
+                    ).toLocaleString()
+                    : "Unknown";
+
+
+                // ==================================
+                // ORDER BOX
+                // ==================================
+
+                const orderBox =
+                    document.createElement("div");
+
+                orderBox.className =
+                    "order-box";
+
+
+                orderBox.innerHTML = `
+
+                    <div class="order-content">
+
+                        ${
+                            image
+                            ? `
+                                <img
+                                    src="${image}"
+                                    class="order-image"
+                                    alt="${productName}"
+                                >
+                              `
+                            : `
+                                <div
+                                    class="order-image"
+                                    style="
+                                        display:flex;
+                                        align-items:center;
+                                        justify-content:center;
+                                        background:#ffe8ef;
+                                    "
+                                >
+                                    No Image
+                                </div>
+                              `
+                        }
+
+
+                        <div class="order-details">
+
+                            <h3>
+                                ${productName}
+                            </h3>
+
+
+                            <p>
+                                <strong>Price:</strong>
+                                ${price}
+                            </p>
+
+
+                            <p>
+                                <strong>Quantity:</strong>
+                                ${quantity}
+                            </p>
+
+
+                            <p>
+                                <strong>Bangle Size:</strong>
+                                ${bangleSize}
+                            </p>
+
+
+                            <!-- STATUS -->
+
+                            <p>
+
+                                <span class="status-label">
+                                    Status:
+                                </span>
+
+                                <select
+                                    class="status-select"
+                                >
+
+                                    <option value="New">
+                                        New
+                                    </option>
+
+                                    <option value="Confirmed">
+                                        Confirmed
+                                    </option>
+
+                                    <option value="Completed">
+                                        Completed
+                                    </option>
+
+                                    <option value="Cancelled">
+                                        Cancelled
+                                    </option>
+
+                                </select>
+
+                                <span
+                                    class="saving"
+                                    style="display:none;"
+                                >
+                                    Saving...
+                                </span>
+
+                            </p>
+
+
+                            <p>
+                                <strong>Ordered:</strong>
+                                ${createdAt}
+                            </p>
+
+
+                            <div class="actions">
+
+                                <button
+                                    class="delete-btn"
+                                >
+                                    🗑 Delete Order
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                ordersContainer.appendChild(
+                    orderBox
+                );
+
+
+                // ==================================
+                // STATUS SELECT
+                // ==================================
+
+                const statusSelect =
+                    orderBox.querySelector(
+                        ".status-select"
+                    );
+
+
+                const savingText =
+                    orderBox.querySelector(
+                        ".saving"
+                    );
+
+
+                // Existing status select pannum
+                if (
+                    [
+                        "New",
+                        "Confirmed",
+                        "Completed",
+                        "Cancelled"
+                    ].includes(status)
+                ) {
+
+                    statusSelect.value =
+                        status;
+
+                } else {
+
+                    statusSelect.value =
+                        "New";
+
+                }
+
+
+                // ==================================
+                // UPDATE STATUS
+                // ==================================
+
+                statusSelect.addEventListener(
+                    "change",
+                    async () => {
+
+                        const newStatus =
+                            statusSelect.value;
+
+
+                        savingText.style.display =
+                            "inline";
+
+
+                        try {
+
+                            await updateDoc(
+
+                                doc(
+                                    db,
+                                    "orders",
+                                    orderId
+                                ),
+
+                                {
+                                    status:
+                                        newStatus
+                                }
+
+                            );
+
+
+                            savingText.textContent =
+                                "Saved ✓";
+
+
+                            setTimeout(() => {
+
+                                savingText.style.display =
+                                    "none";
+
+                                savingText.textContent =
+                                    "Saving...";
+
+                            }, 1500);
+
+
+                        } catch (error) {
+
+                            console.error(error);
+
+
+                            savingText.textContent =
+                                "Failed ❌";
+
+
+                            setTimeout(() => {
+
+                                savingText.style.display =
+                                    "none";
+
+                                savingText.textContent =
+                                    "Saving...";
+
+                            }, 2000);
+
+
+                            alert(
+                                "Failed to update order status."
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                // ==================================
+                // DELETE ORDER
+                // ==================================
+
+                const deleteButton =
+                    orderBox.querySelector(
+                        ".delete-btn"
+                    );
+
+
+                deleteButton.addEventListener(
+                    "click",
+                    async () => {
+
+                        const confirmDelete =
+                            confirm(
+                                "Delete this order?"
+                            );
+
+
+                        if (!confirmDelete) {
+
+                            return;
+
+                        }
+
+
+                        try {
+
+                            await deleteDoc(
+
+                                doc(
+                                    db,
+                                    "orders",
+                                    orderId
+                                )
+
+                            );
+
+
+                            alert(
+                                "Order deleted successfully!"
+                            );
+
+
+                            loadOrders();
+
+
+                        } catch (error) {
+
+                            console.error(error);
+
+
+                            alert(
+                                "Failed to delete order."
+                            );
+
+                        }
+
+                    }
+                );
+
+            });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            ordersContainer.innerHTML = `
+
+                <div class="empty">
+
+                    <h3>
+                        Unable to load orders ❌
+                    </h3>
+
+                    <p>
+                        ${error.message}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    // ==========================================
+    // REFRESH BUTTON
+    // ==========================================
+
+    window.loadOrders =
+        loadOrders;
+
+</script>
+
+</body>
+</html>

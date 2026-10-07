@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MJ Works - Products</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff5f8;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f8bbd0, #f48fb1);
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #880e4f;
+        }
+
+        .back-btn {
+            background: #ad1457;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .form-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .form-box h2 {
+            color: #ad1457;
+            margin-top: 0;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .image-label {
+            display: block;
+            color: #ad1457;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .image-help {
+            display: block;
+            color: #777;
+            font-size: 13px;
+            margin-top: -8px;
+            margin-bottom: 12px;
+        }
+
+        .preview-box {
+            display: none;
+            margin: 5px 0 15px;
+        }
+
+        .preview-box img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #f8bbd0;
+        }
+
+        .upload-status {
+            display: none;
+            color: #ad1457;
+            font-weight: bold;
+            margin: 8px 0 15px;
+        }
+
+        .save-btn {
+            background: #d81b60;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .save-btn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        .cancel-btn {
+            background: #777;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: #fce4ec;
+        }
+
+        .product-info {
+            padding: 18px;
+        }
+
+        .product-info h3 {
+            color: #ad1457;
+            margin-top: 0;
+        }
+
+        .product-info p {
+            margin: 7px 0;
+            color: #666;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            flex: 1;
+            padding: 9px;
+            border: none;
+            border-radius: 7px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background: #8e24aa;
+        }
+
+        .delete-btn {
+            background: #e53935;
+        }
+
+        #message {
+            margin-top: 12px;
+            color: #ad1457;
+            font-weight: bold;
+        }
+
+        @media (max-width: 800px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <h1>MJ Works Products</h1>
+
+    <button class="back-btn" id="backBtn">
+        Dashboard
+    </button>
+
+</header>
+
+
+<div class="container">
+
+    <div class="form-box">
+
+        <h2 id="formTitle">
+            Add Product
+        </h2>
+
+
+        <!-- PRODUCT NAME -->
+
+        <input
+            type="text"
+            id="productName"
+            placeholder="Product Name"
+        >
+
+
+        <!-- CATEGORY -->
+
+        <select id="category">
+
+            <option value="">
+                Select Category
+            </option>
+
+            <optgroup label="Kundan">
+
+                <option value="Bangles">
+                    Bangles
+                </option>
+
+                <option value="Earrings">
+                    Earrings
+                </option>
+
+                <option value="Necklaces">
+                    Necklaces
+                </option>
+
+                <option value="Hair Accessories">
+                    Hair Accessories
+                </option>
+
+                <option value="Combo">
+                    Combo
+                </option>
+
+                <option value="Kids">
+                    Kids
+                </option>
+
+            </optgroup>
+
+
+            <optgroup label="Crochet">
+
+                <option value="Handbags">
+                    Handbags
+                </option>
+
+                <option value="Keychains">
+                    Keychains
+                </option>
+
+                <option value="Hair Accessories">
+                    Hair Accessories
+                </option>
+
+                <option value="Toys">
+                    Toys
+                </option>
+
+                <option value="Bouquets">
+                    Bouquets
+                </option>
+
+            </optgroup>
+
+        </select>
+
+
+        <!-- PRICE -->
+
+        <input
+            type="text"
+            id="price"
+            placeholder="Price / Custom Price Available"
+        >
+
+
+        <!-- IMAGE UPLOAD -->
+
+        <label
+            class="image-label"
+            for="imageFile"
+        >
+            Product Image
+        </label>
+
+        <small class="image-help">
+            <br>
+            Choose an image from the owner's computer
+        </small>
+
+        <input
+            type="file"
+            id="imageFile"
+            accept="image/*"
+        >
+
+
+        <!-- IMAGE PREVIEW -->
+
+        <div
+            class="preview-box"
+            id="previewBox"
+        >
+
+            <img
+                id="imagePreview"
+                src=""
+                alt="Image Preview"
+            >
+
+        </div>
+
+
+        <!-- UPLOAD STATUS -->
+
+        <div
+            class="upload-status"
+            id="uploadStatus"
+        >
+            Uploading image...
+        </div>
+
+
+        <!-- DESCRIPTION -->
+
+        <textarea
+            id="description"
+            placeholder="Product description"
+        ></textarea>
+
+
+        <!-- BUTTONS -->
+
+        <button
+            class="save-btn"
+            id="saveBtn"
+        >
+            Add Product
+        </button>
+
+
+        <button
+            class="cancel-btn"
+            id="cancelBtn"
+            style="display:none;"
+        >
+            Cancel
+        </button>
+
+
+        <div id="message"></div>
+
+    </div>
+
+
+    <h2>
+        All Products
+    </h2>
+
+
+    <div
+        class="products-grid"
+        id="productsGrid"
+    ></div>
+
+</div>
+
+
+
+<script type="module">
+
+    /* =====================================================
+       FIREBASE
+    ===================================================== */
+
+    import {
+        auth,
+        db
+    } from "./firebase-config.js";
+
+
+    import {
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+    import {
+        collection,
+        addDoc,
+        getDocs,
+        doc,
+        updateDoc,
+        deleteDoc
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+
+    /* =====================================================
+       CLOUDINARY SETTINGS
+    ===================================================== */
+
+    const CLOUDINARY_CLOUD_NAME = "tuwif4cr";
+
+    const CLOUDINARY_UPLOAD_PRESET = "mj_works_upload";
+
+
+
+    /* =====================================================
+       EDITING STATE
+    ===================================================== */
+
+    let editingProductId = null;
+
+    let currentImageUrl = "";
+
+
+
+    /* =====================================================
+       AUTH CHECK
+    ===================================================== */
+
+    onAuthStateChanged(auth, (user) => {
+
+        if (!user) {
+
+            window.location.href =
+                "admin-login.html";
+
+            return;
+        }
+
+        loadProducts();
+
+    });
+
+
+
+    /* =====================================================
+       DASHBOARD BUTTON
+    ===================================================== */
+
+    document
+        .getElementById("backBtn")
+        .addEventListener("click", () => {
+
+            window.location.href =
+                "admin-dashboard.html";
+
+        });
+
+
+
+    /* =====================================================
+       IMAGE SELECT → PREVIEW
+    ===================================================== */
+
+    document
+        .getElementById("imageFile")
+        .addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+
+            /* Image file check */
+
+            if (!file.type.startsWith("image/")) {
+
+                showMessage(
+                    "Please select an image file."
+                );
+
+                this.value = "";
+
+                return;
+            }
+
+
+            /* Preview */
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload = function (event) {
+
+                const preview =
+                    document.getElementById(
+                        "imagePreview"
+                    );
+
+                const previewBox =
+                    document.getElementById(
+                        "previewBox"
+                    );
+
+
+                preview.src =
+                    event.target.result;
+
+
+                previewBox.style.display =
+                    "block";
+
+            };
+
+
+            reader.readAsDataURL(file);
+
+        });
+
+
+
+    /* =====================================================
+       CLOUDINARY IMAGE UPLOAD
+    ===================================================== */
+
+    async function uploadImageToCloudinary(file) {
+
+        const uploadUrl =
+            `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "file",
+            file
+        );
+
+
+        formData.append(
+            "upload_preset",
+            CLOUDINARY_UPLOAD_PRESET
+        );
+
+
+        const response =
+            await fetch(
+                uploadUrl,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            console.error(
+                "Cloudinary error:",
+                data
+            );
+
+            throw new Error(
+                data.error?.message ||
+                "Image upload failed."
+            );
+
+        }
+
+
+        return data.secure_url;
+
+    }
+
+
+
+    /* =====================================================
+       LOAD PRODUCTS
+    ===================================================== */
+
+    async function loadProducts() {
+
+        const grid =
+            document.getElementById(
+                "productsGrid"
+            );
+
+
+        grid.innerHTML =
+            "<p>Loading products...</p>";
+
+
+        try {
+
+            const snapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        "products"
+                    )
+                );
+
+
+            grid.innerHTML = "";
+
+
+            if (snapshot.empty) {
+
+                grid.innerHTML =
+                    "<p>No products added yet.</p>";
+
+                return;
+            }
+
+
+            snapshot.forEach(
+                (productDoc) => {
+
+                    const product =
+                        productDoc.data();
+
+
+                    const card =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    card.className =
+                        "product-card";
+
+
+                    card.innerHTML = `
+
+                        <img
+                            src="${product.image || ""}"
+                            alt="${escapeHtml(
+                                product.name ||
+                                "Product"
+                            )}"
+                            onerror="
+                                this.style.display='none'
+                            "
+                        >
+
+                        <div class="product-info">
+
+                            <h3>
+                                ${escapeHtml(
+                                    product.name ||
+                                    "Unnamed Product"
+                                )}
+                            </h3>
+
+                            <p>
+                                <strong>
+                                    Category:
+                                </strong>
+
+                                ${escapeHtml(
+                                    product.category ||
+                                    "-"
+                                )}
+                            </p>
+
+                            <p>
+                                <strong>
+                                    Price:
+                                </strong>
+
+                                ${escapeHtml(
+                                    product.price ||
+                                    "Custom Price Available"
+                                )}
+                            </p>
+
+                            <p>
+                                ${escapeHtml(
+                                    product.description ||
+                                    ""
+                                )}
+                            </p>
+
+                            <div class="actions">
+
+                                <button
+                                    class="edit-btn"
+                                    data-id="${productDoc.id}"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    class="delete-btn"
+                                    data-id="${productDoc.id}"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+
+                    grid.appendChild(card);
+
+                }
+            );
+
+
+            /* =================================================
+               EDIT BUTTONS
+            ================================================= */
+
+            document
+                .querySelectorAll(".edit-btn")
+                .forEach(button => {
+
+                    button.addEventListener(
+                        "click",
+                        () => {
+
+                            const id =
+                                button.dataset.id;
+
+
+                            editProduct(
+                                id,
+                                snapshot
+                            );
+
+                        }
+                    );
+
+                });
+
+
+            /* =================================================
+               DELETE BUTTONS
+            ================================================= */
+
+            document
+                .querySelectorAll(".delete-btn")
+                .forEach(button => {
+
+                    button.addEventListener(
+                        "click",
+                        () => {
+
+                            deleteProduct(
+                                button.dataset.id
+                            );
+
+                        }
+                    );
+
+                });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            grid.innerHTML =
+                "<p>Unable to load products.</p>";
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       EDIT PRODUCT
+    ===================================================== */
+
+    function editProduct(
+        id,
+        snapshot
+    ) {
+
+        const productDoc =
+            snapshot.docs.find(
+                doc => doc.id === id
+            );
+
+
+        if (!productDoc) {
+            return;
+        }
+
+
+        const product =
+            productDoc.data();
+
+
+        document
+            .getElementById("productName")
+            .value =
+            product.name || "";
+
+
+        document
+            .getElementById("category")
+            .value =
+            product.category || "";
+
+
+        document
+            .getElementById("price")
+            .value =
+            product.price || "";
+
+
+        document
+            .getElementById("description")
+            .value =
+            product.description || "";
+
+
+        /* Existing Cloudinary image */
+
+        currentImageUrl =
+            product.image || "";
+
+
+        /* Clear new file selection */
+
+        document
+            .getElementById("imageFile")
+            .value = "";
+
+
+        /* Show existing image */
+
+        if (currentImageUrl) {
+
+            document
+                .getElementById("imagePreview")
+                .src =
+                currentImageUrl;
+
+
+            document
+                .getElementById("previewBox")
+                .style.display =
+                "block";
+
+        } else {
+
+            document
+                .getElementById("previewBox")
+                .style.display =
+                "none";
+
+        }
+
+
+        editingProductId =
+            id;
+
+
+        document
+            .getElementById("formTitle")
+            .textContent =
+            "Edit Product";
+
+
+        document
+            .getElementById("saveBtn")
+            .textContent =
+            "Update Product";
+
+
+        document
+            .getElementById("cancelBtn")
+            .style.display =
+            "inline-block";
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+
+
+    /* =====================================================
+       SAVE / UPDATE PRODUCT
+    ===================================================== */
+
+    document
+        .getElementById("saveBtn")
+        .addEventListener(
+            "click",
+            async () => {
+
+                const name =
+                    document
+                        .getElementById(
+                            "productName"
+                        )
+                        .value
+                        .trim();
+
+
+                const category =
+                    document
+                        .getElementById(
+                            "category"
+                        )
+                        .value;
+
+
+                const price =
+                    document
+                        .getElementById(
+                            "price"
+                        )
+                        .value
+                        .trim();
+
+
+                const description =
+                    document
+                        .getElementById(
+                            "description"
+                        )
+                        .value
+                        .trim();
+
+
+                const imageFile =
+                    document
+                        .getElementById(
+                            "imageFile"
+                        )
+                        .files[0];
+
+
+                /* Required fields */
+
+                if (!name || !category) {
+
+                    showMessage(
+                        "Product name and category are required."
+                    );
+
+                    return;
+                }
+
+
+                const saveButton =
+                    document.getElementById(
+                        "saveBtn"
+                    );
+
+
+                const uploadStatus =
+                    document.getElementById(
+                        "uploadStatus"
+                    );
+
+
+                try {
+
+                    saveButton.disabled =
+                        true;
+
+
+                    /* =================================================
+                       IMAGE UPLOAD
+                    ================================================= */
+
+                    if (imageFile) {
+
+                        uploadStatus.style.display =
+                            "block";
+
+
+                        uploadStatus.textContent =
+                            "Uploading image... 📸";
+
+
+                        currentImageUrl =
+                            await uploadImageToCloudinary(
+                                imageFile
+                            );
+
+
+                        uploadStatus.textContent =
+                            "Image uploaded successfully! ✅";
+
+                    }
+
+
+                    /* =================================================
+                       PRODUCT DATA
+                    ================================================= */
+
+                    const productData = {
+
+                        name,
+
+                        category,
+
+                        price,
+
+                        image:
+                            currentImageUrl,
+
+                        description,
+
+                        updatedAt:
+                            new Date()
+                                .toISOString()
+
+                    };
+
+
+                    /* =================================================
+                       UPDATE
+                    ================================================= */
+
+                    if (editingProductId) {
+
+                        await updateDoc(
+
+                            doc(
+                                db,
+                                "products",
+                                editingProductId
+                            ),
+
+                            productData
+
+                        );
+
+
+                        showMessage(
+                            "Product updated successfully! ✅"
+                        );
+
+                    }
+
+
+                    /* =================================================
+                       ADD
+                    ================================================= */
+
+                    else {
+
+                        productData.createdAt =
+                            new Date()
+                                .toISOString();
+
+
+                        await addDoc(
+
+                            collection(
+                                db,
+                                "products"
+                            ),
+
+                            productData
+
+                        );
+
+
+                        showMessage(
+                            "Product added successfully! ✅"
+                        );
+
+                    }
+
+
+                    /* Reset */
+
+                    clearForm();
+
+                    await loadProducts();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Save error:",
+                        error
+                    );
+
+
+                    showMessage(
+                        error.message ||
+                        "Something went wrong."
+                    );
+
+                } finally {
+
+                    saveButton.disabled =
+                        false;
+
+                    uploadStatus.style.display =
+                        "none";
+
+                }
+
+            }
+        );
+
+
+
+    /* =====================================================
+       DELETE PRODUCT
+    ===================================================== */
+
+    async function deleteProduct(id) {
+
+        const confirmDelete =
+            confirm(
+                "Delete this product?"
+            );
+
+
+        if (!confirmDelete) {
+            return;
+        }
+
+
+        try {
+
+            await deleteDoc(
+                doc(
+                    db,
+                    "products",
+                    id
+                )
+            );
+
+
+            showMessage(
+                "Product deleted successfully! ✅"
+            );
+
+
+            loadProducts();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            showMessage(
+                "Unable to delete product."
+            );
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       CANCEL EDIT
+    ===================================================== */
+
+    document
+        .getElementById("cancelBtn")
+        .addEventListener(
+            "click",
+            clearForm
+        );
+
+
+
+    /* =====================================================
+       CLEAR FORM
+    ===================================================== */
+
+    function clearForm() {
+
+        document
+            .getElementById(
+                "productName"
+            )
+            .value = "";
+
+
+        document
+            .getElementById(
+                "category"
+            )
+            .value = "";
+
+
+        document
+            .getElementById(
+                "price"
+            )
+            .value = "";
+
+
+        document
+            .getElementById(
+                "imageFile"
+            )
+            .value = "";
+
+
+        document
+            .getElementById(
+                "description"
+            )
+            .value = "";
+
+
+        document
+            .getElementById(
+                "previewBox"
+            )
+            .style.display =
+            "none";
+
+
+        document
+            .getElementById(
+                "imagePreview"
+            )
+            .src = "";
+
+
+        document
+            .getElementById(
+                "uploadStatus"
+            )
+            .style.display =
+            "none";
+
+
+        editingProductId =
+            null;
+
+
+        currentImageUrl =
+            "";
+
+
+        document
+            .getElementById(
+                "formTitle"
+            )
+            .textContent =
+            "Add Product";
+
+
+        document
+            .getElementById(
+                "saveBtn"
+            )
+            .textContent =
+            "Add Product";
+
+
+        document
+            .getElementById(
+                "cancelBtn"
+            )
+            .style.display =
+            "none";
+
+    }
+
+
+
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    function showMessage(message) {
+
+        const messageBox =
+            document.getElementById(
+                "message"
+            );
+
+
+        messageBox.textContent =
+            message;
+
+
+        setTimeout(() => {
+
+            messageBox.textContent =
+                "";
+
+        }, 4000);
+
+    }
+
+
+
+    /* =====================================================
+       HTML ESCAPE
+    ===================================================== */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+</script>
+
+</body>
+
+</html>

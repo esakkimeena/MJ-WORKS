@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MJ Works - Admin Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: #fff5f8;
+        }
+
+        .login-box {
+            width: 350px;
+            padding: 35px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+
+        h1 {
+            color: #c2185b;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #d81b60;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #ad1457;
+        }
+
+        #message {
+            margin-top: 15px;
+            color: #d81b60;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-box">
+        <h1>MJ Works</h1>
+        <p>Admin Login</p>
+
+        <input type="email" id="email" placeholder="Owner Email">
+
+        <input type="password" id="password" placeholder="Password">
+
+        <button id="loginBtn">Login</button>
+
+        <div id="message"></div>
+    </div>
+
+    <script type="module">
+        import { auth } from "./firebase-config.js";
+
+        import {
+            signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+        const loginBtn = document.getElementById("loginBtn");
+        const message = document.getElementById("message");
+
+        loginBtn.addEventListener("click", async () => {
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (!email || !password) {
+                message.textContent = "Please enter email and password.";
+                return;
+            }
+
+            try {
+
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+                message.textContent = "Login successful!";
+
+                setTimeout(() => {
+                    window.location.href = "admin-dashboard.html";
+                }, 800);
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.textContent = "Invalid email or password.";
+            }
+        });
+    </script>
+
+</body>
+</html>

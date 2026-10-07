@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MJ Works - Settings</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff7fa;
+            padding: 30px;
+            margin: 0;
+        }
+
+        h1 {
+            color: #c2185b;
+        }
+
+        .setting-box {
+            background: white;
+            padding: 25px;
+            margin-top: 20px;
+            border-radius: 12px;
+            border: 1px solid #f3b6cc;
+            max-width: 600px;
+        }
+
+        .setting-box h3 {
+            color: #c2185b;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #d81b60;
+        }
+
+        button {
+            background: #d81b60;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #ad1457;
+        }
+
+        .save-btn {
+            margin-top: 22px;
+            padding: 12px 25px;
+            font-size: 15px;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button onclick="window.location.href='admin-dashboard.html'">
+        ← Back to Dashboard
+    </button>
+
+    <h1>MJ Works Settings</h1>
+
+    <div class="setting-box">
+
+        <h3>Shop Settings</h3>
+
+        <label for="shopName">Shop Name</label>
+        <input
+            type="text"
+            id="shopName"
+            placeholder="Enter shop name"
+        >
+
+        <label for="whatsappNumber">WhatsApp Number</label>
+        <input
+            type="text"
+            id="whatsappNumber"
+            placeholder="Enter WhatsApp number"
+        >
+
+        <label for="email">Contact Email</label>
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter contact email"
+        >
+
+        <button class="save-btn" onclick="saveSettings()">
+            Save Settings
+        </button>
+
+        <p id="message"></p>
+
+    </div>
+
+    <script type="module">
+
+        import { auth, db } from "./firebase-config.js";
+
+        import {
+            doc,
+            getDoc,
+            setDoc
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+        import {
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+        const OWNER_UID = "oAzh2vHumiOWqWlpd6R9bGewBOt2";
+
+
+        // Authentication check
+        onAuthStateChanged(auth, async (user) => {
+
+            if (!user) {
+                window.location.href = "admin-login.html";
+                return;
+            }
+
+            if (user.uid !== OWNER_UID) {
+                alert("Access denied.");
+                window.location.href = "admin-dashboard.html";
+                return;
+            }
+
+            await loadSettings();
+        });
+
+
+        // Load settings
+        async function loadSettings() {
+
+            try {
+
+                const settingsRef = doc(db, "settings", "shop");
+                const settingsSnap = await getDoc(settingsRef);
+
+                if (settingsSnap.exists()) {
+
+                    const data = settingsSnap.data();
+
+                    document.getElementById("shopName").value =
+                        data.shopName || "";
+
+                    document.getElementById("whatsappNumber").value =
+                        data.whatsappNumber || "";
+
+                    document.getElementById("email").value =
+                        data.email || "";
+                }
+
+            } catch (error) {
+
+                console.error("Error loading settings:", error);
+
+                document.getElementById("message").textContent =
+                    "❌ Failed to load settings.";
+
+                document.getElementById("message").style.color = "red";
+            }
+        }
+
+
+        // Save settings
+        window.saveSettings = async function () {
+
+            const shopName =
+                document.getElementById("shopName").value.trim();
+
+            const whatsappNumber =
+                document.getElementById("whatsappNumber").value.trim();
+
+            const email =
+                document.getElementById("email").value.trim();
+
+
+            if (!shopName || !whatsappNumber) {
+
+                document.getElementById("message").textContent =
+                    "⚠️ Shop Name and WhatsApp Number are required.";
+
+                document.getElementById("message").style.color = "#d81b60";
+
+                return;
+            }
+
+
+            try {
+
+                await setDoc(
+                    doc(db, "settings", "shop"),
+                    {
+                        shopName: shopName,
+                        whatsappNumber: whatsappNumber,
+                        email: email
+                    }
+                );
+
+
+                document.getElementById("message").textContent =
+                    "✅ Settings saved successfully!";
+
+                document.getElementById("message").style.color = "green";
+
+
+            } catch (error) {
+
+                console.error("Error saving settings:", error);
+
+                document.getElementById("message").textContent =
+                    "❌ Failed to save settings.";
+
+                document.getElementById("message").style.color = "red";
+            }
+        };
+
+    </script>
+
+</body>
+
+</html>
